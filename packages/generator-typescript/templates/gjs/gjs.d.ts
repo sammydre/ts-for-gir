@@ -34,6 +34,52 @@ import cairo from 'cairo';
 
 // https://gitlab.gnome.org/GNOME/gjs/-/blob/1.72.0/modules/script/package.js
 declare namespace package {
+
+
+    // Defines the state before initialization
+    export interface UninitializedPackage {
+        /** The base name of the entry point (eg. org.foo.Bar.App) */
+        name: undefined;
+        /** The version of the package */
+        version: undefined;
+        /** The prefix of the package */
+        prefix: undefined;
+        /** The final datadir when installed; usually, these would be prefix + '/share' */
+        datadir: undefined;
+        /** The final libdir when installed; usually, these would be prefix + '/lib' (or '/lib64') */
+        libdir: undefined;
+        /** The final pkgdatadir when installed; usually, this would be prefix + '/share' */
+        pkgdatadir: undefined;
+        /** The final pkglibdir when installed; usually, this would be prefix + '/lib' (or '/lib64') */
+        pkglibdir: undefined;
+        /** The final moduledir when installed; usually, this would be prefix + '/lib' (or '/lib64') */
+        moduledir: undefined;
+        /** The directory containing gettext translation files; this will be datadir + '/locale' when installed and './po' in the source tree */
+        localedir: undefined;
+    }
+
+    // Defines the state after initialization
+    export interface InitializedPackage {
+        /** The base name of the entry point (eg. org.foo.Bar.App) */
+        name: string;
+        /** The version of the package */
+        version: string;
+        /** The prefix of the package */
+        prefix: string;
+        /** The final datadir when installed; usually, these would be prefix + '/share' */
+        datadir: string;
+        /** The final libdir when installed; usually, these would be prefix + '/lib' (or '/lib64') */
+        libdir: string;
+        /** The final pkgdatadir when installed; usually, this would be prefix + '/share' */
+        pkgdatadir: string;
+        /** The final pkglibdir when installed; usually, this would be prefix + '/lib' (or '/lib64') */
+        pkglibdir: string;
+        /** The final moduledir when installed; usually, this would be prefix + '/lib' (or '/lib64') */
+        moduledir: string;
+        /** The directory containing gettext translation files; this will be datadir + '/locale' when installed and './po' in the source tree */
+        localedir: string;
+    }
+
     /**
      * Although there are references in the documentation of more properties that
      * this object should accepts, only the following are actually used in the init code,
@@ -61,23 +107,23 @@ declare namespace package {
     }
 
     /** The base name of the entry point (eg. org.foo.Bar.App) */
-    export const name: string | undefined
+    export const name: InitializedPackage['name'] | UninitializedPackage['name'];
     /** The version of the package */
-    export const version: string | undefined
+    export const version: InitializedPackage['version'] | UninitializedPackage['version']
     /** The prefix of the package */
-    export const prefix: string | undefined
+    export const prefix: InitializedPackage['prefix'] | UninitializedPackage['prefix']
     /** The final datadir when installed; usually, these would be prefix + '/share' */
-    export const datadir: string | undefined
+    export const datadir: InitializedPackage['datadir'] | UninitializedPackage['datadir']
     /** The final libdir when installed; usually, these would be prefix + '/lib' (or '/lib64') */
-    export const libdir: string | undefined
+    export const libdir: InitializedPackage['libdir'] | UninitializedPackage['libdir']
     /** The final pkgdatadir when installed; usually, this would be prefix + '/share' */
-    export const pkgdatadir: string | undefined
+    export const pkgdatadir: InitializedPackage['pkgdatadir'] | UninitializedPackage['pkgdatadir']
     /** The final pkglibdir when installed; usually, this would be prefix + '/lib' (or '/lib64') */
-    export const pkglibdir: string | undefined
+    export const pkglibdir: InitializedPackage['pkglibdir'] | UninitializedPackage['pkglibdir']
     /** The final moduledir when installed; usually, this would be prefix + '/lib' (or '/lib64') */
-    export const moduledir: string | undefined
+    export const moduledir: InitializedPackage['moduledir'] | UninitializedPackage['moduledir']
     /** The directory containing gettext translation files; this will be datadir + '/locale' when installed and './po' in the source tree */
-    export const localedir: string | undefined
+    export const localedir: InitializedPackage['localedir'] | UninitializedPackage['localedir']
 
     /**
      * Initialize directories and global variables. Must be called
@@ -121,7 +167,7 @@ declare namespace package {
      *
      * @param {object} params package parameters
      */
-    export function init(params: PackageInitParams): void;
+    export function init(params: PackageInitParams): asserts this is InitializedPackage;
     /**
      * This is the function to use if you want to have multiple
      * entry points in one package.
@@ -606,7 +652,7 @@ declare global {
     function logError(exception: object, message?: any): void
     function logError(message?: any): void
 
-    const pkg: typeof package
+    const pkg: undefined | typeof package & package.InitializedPackage
 
     interface BooleanConstructor {
         $gtype: GObject.GType<boolean>
